@@ -37,11 +37,11 @@ def analisadorLexico(programa):
         if indicePrograma == len(programa):
             break
 
-        c = programa[indicePrograma]
+        letra = programa[indicePrograma]
 
         if comentario:
 
-            if VerificaComentario(c):
+            if VerificaComentario(letra):
                 textoComentario = RecuperaTextoComentario(indicePrograma - 1)
                 indicePrograma2 = indicePrograma + len(textoComentario) - 1
                 indiceLinha = indicePrograma2
@@ -50,44 +50,44 @@ def analisadorLexico(programa):
                 comentario = False
                 continue
 
-        if VerificaComentario(c):
+        if VerificaComentario(letra):
             comentario = True
             continue
 
-        if c == "\n":
+        if letra == "\n":
             QuandoEncontrarFinalDaLinha()
             continue
 
-        if c == "(":
+        if letra == "(":
             AdicionarToken("abre-parenteses", "(", linhaPrograma, indiceLinha - 1)
             continue
 
-        if c == ")":
+        if letra == ")":
             AdicionarToken("fecha-parenteses", ")", linhaPrograma, indiceLinha - 1)
             continue
 
-        if c == "{":
-            AdicionarToken("abre-chaves", "(", linhaPrograma, indiceLinha - 1)
+        if letra == "{":
+            AdicionarToken("abre-chaves", "{", linhaPrograma, indiceLinha)
             continue
 
-        if c == "}":
-            AdicionarToken("fecha-chaves", ")", linhaPrograma, indiceLinha - 1)
+        if letra == "}":
+            AdicionarToken("fecha-chaves", "}", linhaPrograma, indiceLinha - 1)
             continue
 
-        if c == ":" and programa[indicePrograma + 1] == ":":
+        if letra == ":" and programa[indicePrograma + 1] == ":":
             AdicionarToken("atribuicao", "::", linhaPrograma, indiceLinha - 1)
             indicePrograma+=1
             continue
 
-        if c == ":":
+        if letra == ":":
             AdicionarToken("dois-pontos", ":", linhaPrograma, indiceLinha - 1)
             continue
 
-        if c == ",":
+        if letra == ",":
             AdicionarToken("virgula", ",", linhaPrograma, indiceLinha - 1)
             continue
 
-        if c.islower():
+        if letra.islower():
             palavra = RecuperaPalavra(indicePrograma)
             
             indicePrograma2 = indicePrograma + len(palavra)
@@ -95,7 +95,7 @@ def analisadorLexico(programa):
             AdicionarToken("identificador", palavra,
                            linhaPrograma, indiceLinha - len(palavra))
 
-        if c.isupper():
+        if letra.isupper():
             palavra = RecuperaPalavra(indicePrograma)
             indicePrograma2 = indicePrograma + len(palavra)
             indiceLinha -= 1
@@ -204,7 +204,7 @@ tiposDeVariaveis:Funcao::{
   logicoVar:Logico::Sim
 }
 
---tiposDeFluxoDeControle:Funcao:Logico::{
+tiposDeFluxoDeControle:Funcao:Logico::{
   resultado:Logico::Nao
 
   se(1 = 2){
