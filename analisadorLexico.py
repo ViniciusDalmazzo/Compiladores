@@ -42,7 +42,7 @@ reservados = [
 
 logicos = [
     "Sim",
-    "Não"
+    "Nao"
 ]
 
 desconhecido = [
@@ -188,7 +188,7 @@ def analisadorLexico(programa):
                       linhaPrograma,
                       indiceLinha - len(palavra))
             AdicionarToken("desconhecido", letra,
-                           linhaPrograma, indiceLinha - 1)       
+                           linhaPrograma, indiceLinha)       
 
                 
 
@@ -255,6 +255,7 @@ def RecuperaPalavra(indice):
 
     if ultimaLetra in endOfString:
         palavra = palavra[0:len(palavra) - 1]
+        indiceLinha -= 1
 
     return palavra
 
