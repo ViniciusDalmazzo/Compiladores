@@ -17,6 +17,38 @@ endOfString = [
     ':'
 ]
 
+endOfStringWithoutSpace = [
+    ',',
+    '(',
+    ')',
+    '{',
+    '}',
+    '=',
+    '<',
+    '>',
+    '+',
+    '\n',
+    ':',
+    '@'
+]
+
+reservados = [
+    "se",
+    "se nao",
+    "se nao se",
+    "enquanto",
+    "retorna"
+]
+
+logicos = [
+    "Sim",
+    "Não"
+]
+
+desconhecido = [
+    '@'
+]
+
 tokens, erros = [], []
 comentario = False
 indicePrograma, linhaPrograma, indicePrograma2, indiceLinha = -1, 1, -1, -1
@@ -74,6 +106,22 @@ def analisadorLexico(programa):
             AdicionarToken("fecha-chaves", "}", linhaPrograma, indiceLinha - 1)
             continue
 
+        if letra == "=":
+            AdicionarToken("operador-igual", "=", linhaPrograma, indiceLinha - 1)
+            continue
+        
+        if letra == "<":
+            AdicionarToken("operador-menor", "<", linhaPrograma, indiceLinha - 1)
+            continue            
+
+        if letra == ">":
+            AdicionarToken("operador-maior", ">", linhaPrograma, indiceLinha - 1)
+            continue
+
+        if letra == "+":
+            AdicionarToken("operador-mais", "+", linhaPrograma, indiceLinha - 1)
+            continue
+
         if letra == ":" and programa[indicePrograma + 1] == ":":
             AdicionarToken("atribuicao", "::", linhaPrograma, indiceLinha - 1)
             indicePrograma+=1
@@ -88,19 +136,53 @@ def analisadorLexico(programa):
             continue
 
         if letra.islower():
-            palavra = RecuperaPalavra(indicePrograma)
-            
+            palavra = RecuperaPalavra(indicePrograma)            
             indicePrograma2 = indicePrograma + len(palavra)
             indiceLinha -= 1
-            AdicionarToken("identificador", palavra,
+
+            grupo = "identificador"
+
+            if palavra in reservados:
+                grupo = "reservado"
+
+            AdicionarToken(grupo, palavra,
                            linhaPrograma, indiceLinha - len(palavra))
 
         if letra.isupper():
             palavra = RecuperaPalavra(indicePrograma)
             indicePrograma2 = indicePrograma + len(palavra)
             indiceLinha -= 1
-            AdicionarToken("reservado", palavra,
+
+            grupo = "reservado"
+
+            if palavra in logicos:
+                grupo = "logico"
+
+            AdicionarToken(grupo, palavra,
                            linhaPrograma, indiceLinha - len(palavra))
+
+        if letra.isnumeric():
+            palavra = RecuperaPalavra(indicePrograma)            
+            indicePrograma2 = indicePrograma + len(palavra)
+            indiceLinha -= 1
+            AdicionarToken("numero", palavra,
+                           linhaPrograma, indiceLinha - len(palavra))
+
+        if letra == "'":
+            palavra = RecuperaTexto(indicePrograma)            
+            indicePrograma2 = indicePrograma + len(palavra)
+            indiceLinha -= 1
+            AdicionarToken("texto", palavra,
+                           linhaPrograma, indiceLinha - len(palavra))                           
+
+        if letra in desconhecido:
+            indicePrograma2 = indicePrograma + 1
+            indiceLinha -= 1
+            AdicionarErro(letra,
+                      linhaPrograma,
+                      indiceLinha - len(palavra))
+
+                
 
     return {"tokens": tokens, "erros": erros}
 
@@ -111,6 +193,13 @@ def AdicionarToken(grupo, texto, linha, indice):
         "grupo": grupo, "texto": texto,
         "local": {"linha": linha, "indice": indice}
     })
+
+def AdicionarErro(texto, linha, indice):
+    
+    erros.append({
+            "texto": "simbolo," + texto + ", desconhecido",
+            "local": {"linha": 19, "indice": 11}
+        })
 
 
 def VerificaComentario(letra):
@@ -139,7 +228,28 @@ def RecuperaTextoComentario(indice):
 def RecuperaPalavra(indice):
 
     global linhaPrograma, indiceLinha
-    textoComentario = ""
+    palavra = ""
+
+    while (programa[indice] not in endOfString):
+        palavra += programa[indice]
+        indiceLinha += 1
+        indice += 1
+
+    if palavra == "se":
+        while (programa[indice] not in endOfStringWithoutSpace):
+            palavra += programa[indice]
+            indiceLinha += 1
+            indice += 1
+    else:
+        return palavra
+
+    return palavra
+
+def RecuperaTexto(indice):
+    
+    global linhaPrograma, indiceLinha
+    textoComentario = programa[indice]
+    indice += 1
 
     while (programa[indice] not in endOfString):
         textoComentario += programa[indice]
