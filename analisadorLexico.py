@@ -99,7 +99,7 @@ def analisadorLexico(programa):
             continue
 
         if letra == "{":
-            AdicionarToken("abre-chaves", "{", linhaPrograma, indiceLinha)
+            AdicionarToken("abre-chaves", "{", linhaPrograma, indiceLinha - 1)
             continue
 
         if letra == "}":
@@ -124,8 +124,15 @@ def analisadorLexico(programa):
 
         if letra == ":" and programa[indicePrograma + 1] == ":":
             AdicionarToken("atribuicao", "::", linhaPrograma, indiceLinha - 1)
+            indiceLinha += 1
             indicePrograma+=1
             continue
+
+        if letra == "!" and programa[indicePrograma + 1] == "=":
+            AdicionarToken("operador-diferente", "!=", linhaPrograma, indiceLinha - 1)
+            indiceLinha += 1
+            indicePrograma+=1
+            continue            
 
         if letra == ":":
             AdicionarToken("dois-pontos", ":", linhaPrograma, indiceLinha - 1)
@@ -171,7 +178,6 @@ def analisadorLexico(programa):
         if letra == "'":
             palavra = RecuperaTexto(indicePrograma)            
             indicePrograma2 = indicePrograma + len(palavra)
-            indiceLinha -= 1
             AdicionarToken("texto", palavra,
                            linhaPrograma, indiceLinha - len(palavra))                           
 
