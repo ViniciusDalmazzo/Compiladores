@@ -181,6 +181,8 @@ def analisadorLexico(programa):
             AdicionarErro(letra,
                       linhaPrograma,
                       indiceLinha - len(palavra))
+            AdicionarToken("desconhecido", letra,
+                           linhaPrograma, indiceLinha - 1)       
 
                 
 
@@ -197,7 +199,7 @@ def AdicionarToken(grupo, texto, linha, indice):
 def AdicionarErro(texto, linha, indice):
     
     erros.append({
-            "texto": "simbolo," + texto + ", desconhecido",
+            "texto": "simbolo, " + texto + ", desconhecido",
             "local": {"linha": 19, "indice": 11}
         })
 
@@ -242,6 +244,11 @@ def RecuperaPalavra(indice):
             indice += 1
     else:
         return palavra
+
+    ultimaLetra = palavra[len(palavra) - 1]
+
+    if ultimaLetra in endOfString:
+        palavra = palavra[0:len(palavra) - 1]
 
     return palavra
 
