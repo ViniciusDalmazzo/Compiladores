@@ -183,12 +183,11 @@ def analisadorLexico(programa):
 
         if letra in desconhecido:
             indicePrograma2 = indicePrograma + 1
-            indiceLinha -= 1
             AdicionarErro(letra,
                       linhaPrograma,
                       indiceLinha - len(palavra))
             AdicionarToken("desconhecido", letra,
-                           linhaPrograma, indiceLinha)       
+                           linhaPrograma, indiceLinha - 1)       
 
                 
 
