@@ -2,6 +2,7 @@
 
 import json
 
+# Lista de varíaveis utilizadas para representar o fim de um token
 endOfString = [
     ',',
     '(',
@@ -17,6 +18,8 @@ endOfString = [
     ':'
 ]
 
+# Lista de varíaveis utilizadas para representar o fim de um token
+# Porém sem a utilização do vazio ' ', pois a lista é utilizada para o caso especifico de se, se nao e se nao se
 endOfStringWithoutSpace = [
     ',',
     '(',
@@ -32,6 +35,7 @@ endOfStringWithoutSpace = [
     '@'
 ]
 
+# Lista de palavras que começam com letrar minusculas mas são reservadas
 reservados = [
     "se",
     "se nao",
@@ -40,11 +44,13 @@ reservados = [
     "retorna"
 ]
 
+# Lista de palavras que representam os operadores lógicos
 logicos = [
     "Sim",
     "Nao"
 ]
 
+# Letras não mapeadas pela linguagem
 desconhecido = [
     '@'
 ]
@@ -71,6 +77,7 @@ def analisadorLexico(programa):
 
         letra = programa[indicePrograma]
 
+        # Regra para identificação de comentários na linha
         if comentario:
 
             if VerificaComentario(letra):
@@ -82,66 +89,83 @@ def analisadorLexico(programa):
                 comentario = False
                 continue
 
+        # Regra para identificação se a letra inicial é um comentário
         if VerificaComentario(letra):
             comentario = True
             continue
 
+        # Regra para identificação de final da linha (\n)
         if letra == "\n":
             QuandoEncontrarFinalDaLinha()
             continue
 
+        # Regra para identificação de abre parentestes
         if letra == "(":
             AdicionarToken("abre-parenteses", "(", linhaPrograma, indiceLinha - 1)
             continue
 
+        # Regra para identificação de fecha parentestes
         if letra == ")":
             AdicionarToken("fecha-parenteses", ")", linhaPrograma, indiceLinha - 1)
             continue
 
+        # Regra para identificação de abre chaves
         if letra == "{":
             AdicionarToken("abre-chaves", "{", linhaPrograma, indiceLinha - 1)
             continue
 
+        # Regra para identificação de fecha chaves
         if letra == "}":
             AdicionarToken("fecha-chaves", "}", linhaPrograma, indiceLinha - 1)
             continue
 
+        # Regra para identificação do operador igual
         if letra == "=":
             AdicionarToken("operador-igual", "=", linhaPrograma, indiceLinha - 1)
             continue
         
+        # Regra para identificação do operador menor
         if letra == "<":
             AdicionarToken("operador-menor", "<", linhaPrograma, indiceLinha - 1)
             continue            
 
+        # Regra para identificação do operador maior
         if letra == ">":
             AdicionarToken("operador-maior", ">", linhaPrograma, indiceLinha - 1)
             continue
 
+        # Regra para identificação do operador mais
         if letra == "+":
             AdicionarToken("operador-mais", "+", linhaPrograma, indiceLinha - 1)
             continue
 
+        # Regra para identificação da atribuição com dois pontos, utilizando a letra atual e a próxima letra utilizando a manipulação de indices
         if letra == ":" and programa[indicePrograma + 1] == ":":
             AdicionarToken("atribuicao", "::", linhaPrograma, indiceLinha - 1)
             indiceLinha += 1
             indicePrograma+=1
             continue
 
+        # Regra para identificação do operador diferente, utilizando a letra atual e a próxima letra utilizando a manipulação de indices
         if letra == "!" and programa[indicePrograma + 1] == "=":
             AdicionarToken("operador-diferente", "!=", linhaPrograma, indiceLinha - 1)
             indiceLinha += 1
             indicePrograma+=1
             continue            
 
+        # Regra para identificação de dois pontos
         if letra == ":":
             AdicionarToken("dois-pontos", ":", linhaPrograma, indiceLinha - 1)
             continue
 
+        # Regra para identificação de virgula
         if letra == ",":
             AdicionarToken("virgula", ",", linhaPrograma, indiceLinha - 1)
             continue
 
+        # Regra para identificação de uma palavra que se inicia com letra minuscula
+        # Após identificação, toda palavra é recuperada para validação
+        # Dependendo do grupo no qual ela se encaixa uma regra é aplicada
         if letra.islower():
             palavra = RecuperaPalavra(indicePrograma)            
             indicePrograma2 = indicePrograma + len(palavra)
@@ -155,6 +179,9 @@ def analisadorLexico(programa):
             AdicionarToken(grupo, palavra,
                            linhaPrograma, indiceLinha - len(palavra))
 
+        # Regra para identificação de uma palavra que se inicia com letra maiuscula
+        # Após identificação, toda palavra é recuperada para validação
+        # Dependendo do grupo no qual ela se encaixa uma regra é aplicada
         if letra.isupper():
             palavra = RecuperaPalavra(indicePrograma)
             indicePrograma2 = indicePrograma + len(palavra)
@@ -168,6 +195,8 @@ def analisadorLexico(programa):
             AdicionarToken(grupo, palavra,
                            linhaPrograma, indiceLinha - len(palavra))
 
+        # Regra para identificação de um numero
+        # Após identificação, todo numero é recuperado e o token de numero é adicionado
         if letra.isnumeric():
             palavra = RecuperaPalavra(indicePrograma)            
             indicePrograma2 = indicePrograma + len(palavra)
@@ -175,12 +204,16 @@ def analisadorLexico(programa):
             AdicionarToken("numero", palavra,
                            linhaPrograma, indiceLinha - len(palavra))
 
+        # Regra para identificação de uma palavra que se inicia com aspas simples
+        # Após identificação, toda palavra é recuperada e o token de texto é adicionado
         if letra == "'":
             palavra = RecuperaTexto(indicePrograma)            
             indicePrograma2 = indicePrograma + len(palavra)
             AdicionarToken("texto", palavra,
                            linhaPrograma, indiceLinha - len(palavra))                           
 
+        # Regra para identificação de uma palavra é desconhecida
+        # Após identificação, a letra é adicionada como um erro e um token desconhecido
         if letra in desconhecido:
             indicePrograma2 = indicePrograma + 1
             AdicionarErro(letra,
@@ -189,11 +222,10 @@ def analisadorLexico(programa):
             AdicionarToken("desconhecido", letra,
                            linhaPrograma, indiceLinha - 1)       
 
-                
-
     return {"tokens": tokens, "erros": erros}
 
 
+# Método que adiciona um token para retorno
 def AdicionarToken(grupo, texto, linha, indice):
 
     tokens.append({
@@ -201,6 +233,7 @@ def AdicionarToken(grupo, texto, linha, indice):
         "local": {"linha": linha, "indice": indice}
     })
 
+# Método que adiciona um erro para retorno
 def AdicionarErro(texto, linha, indice):
     
     erros.append({
@@ -209,6 +242,7 @@ def AdicionarErro(texto, linha, indice):
         })
 
 
+# Método que verifica se a letra se inicia como um comentário
 def VerificaComentario(letra):
     global comentario
 
@@ -218,7 +252,7 @@ def VerificaComentario(letra):
 
     return False
 
-
+# Método que recupera toda linha de comentário
 def RecuperaTextoComentario(indice):
 
     global linhaPrograma, indiceLinha
@@ -231,7 +265,8 @@ def RecuperaTextoComentario(indice):
 
     return textoComentario
 
-
+# Método que recupera toda palavra de acordo com o inicio da palavra e o fim de uma palavra (endOfString)
+# Além disso é verificado se essa palavra faz parte da regra de (se, se nao, se nao se)
 def RecuperaPalavra(indice):
 
     global linhaPrograma, indiceLinha
@@ -258,6 +293,7 @@ def RecuperaPalavra(indice):
 
     return palavra
 
+# Método para recuperar toda palavra de acorodo com indice inicial da palavra
 def RecuperaTexto(indice):
     
     global linhaPrograma, indiceLinha
@@ -271,7 +307,7 @@ def RecuperaTexto(indice):
 
     return textoComentario
 
-
+# Método para incrementar a varíavel linha do programa e adicionar o token de quebra de linha
 def QuandoEncontrarFinalDaLinha():
     global linhaPrograma, indiceLinha
 
